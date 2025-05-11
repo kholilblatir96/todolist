@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'info_page.dart';
 
 void main() {
   runApp(const TodoListApp());
@@ -52,6 +53,7 @@ class TodoHomePage extends StatefulWidget {
 
 class _TodoHomePageState extends State<TodoHomePage> {
   final List<String> _todos = [];
+  final List<String> _deletedTodos = [];
   final TextEditingController _controller = TextEditingController();
 
   void _addTodo() {
@@ -65,10 +67,11 @@ class _TodoHomePageState extends State<TodoHomePage> {
   }
 
   void _removeTodo(int index) {
-    setState(() {
-      _todos.removeAt(index);
-    });
-  }
+  setState(() {
+    _deletedTodos.add(_todos[index]); // simpan yang dihapus
+    _todos.removeAt(index);
+  });
+}
 
   @override
   void dispose() {
@@ -81,6 +84,19 @@ class _TodoHomePageState extends State<TodoHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Daftar Tugas'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const InfoPage()),
+              );
+            },
+          ),
+          
+          
+        ],
       ),
       body: SafeArea(
         child: Column(
@@ -101,9 +117,10 @@ class _TodoHomePageState extends State<TodoHomePage> {
                   const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: _addTodo,
-                    child: const Text('Tambah',
-                    style: TextStyle(color: Colors.white),
-                    )
+                    child: const Text(
+                      'Tambah',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),
