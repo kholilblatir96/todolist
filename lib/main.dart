@@ -1,165 +1,86 @@
 import 'package:flutter/material.dart';
-import 'info_page.dart';
+import 'package:todolist/home_page.dart';
+import 'package:todolist/second_page.dart';
 
 void main() {
-  runApp(const TodoListApp());
+  runApp(const MyApp());
 }
 
-class TodoListApp extends StatelessWidget {
-  const TodoListApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _isDarkMode = false;
+
+  void toggleTheme() {
+    setState(() {
+      _isDarkMode = !_isDarkMode;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'Multi Theme Demo',
       debugShowCheckedModeBanner: false,
-      title: 'Todo List',
-      theme: ThemeData(
-        primarySwatch: Colors.indigo,
-        scaffoldBackgroundColor: const Color(0xFFF2F4F7),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.indigo,
-          elevation: 2,
-          centerTitle: true,
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.indigo,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            textStyle: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ),
-        inputDecorationTheme: const InputDecorationTheme(
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(),
-        ),
-      ),
-      home: const TodoHomePage(),
+      theme: _isDarkMode ? _darkTheme : _lightTheme,
+      initialRoute: '/',
+      routes: {
+        '/': (context) => HomePage(toggleTheme: toggleTheme),
+        '/second': (context) => SecondPage(toggleTheme: toggleTheme),
+      },
     );
   }
-}
 
-class TodoHomePage extends StatefulWidget {
-  const TodoHomePage({super.key});
-
-  @override
-  State<TodoHomePage> createState() => _TodoHomePageState();
-}
-
-class _TodoHomePageState extends State<TodoHomePage> {
-  final List<String> _todos = [];
-  final List<String> _deletedTodos = [];
-  final TextEditingController _controller = TextEditingController();
-
-  void _addTodo() {
-    final text = _controller.text;
-    if (text.isNotEmpty) {
-      setState(() {
-        _todos.add(text);
-        _controller.clear();
-      });
-    }
-  }
-
-  void _removeTodo(int index) {
-  setState(() {
-    _deletedTodos.add(_todos[index]); // simpan yang dihapus
-    _todos.removeAt(index);
-  });
-}
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Daftar Tugas'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const InfoPage()),
-              );
-            },
-          ),
-          
-          
-        ],
+  // Light theme
+  final ThemeData _lightTheme = ThemeData(
+    useMaterial3: true,
+    brightness: Brightness.light,
+    colorScheme: ColorScheme.light(
+      primary: Colors.blue.shade700,
+      secondary: Colors.teal,
+      surface: Colors.white,
+      background: Colors.grey.shade50,
+    ),
+    fontFamily: 'Poppins',
+    textTheme: const TextTheme(
+      displayLarge: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+      bodyLarge: TextStyle(fontSize: 16),
+      labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      decoration: const InputDecoration(
-                        labelText: 'Tambahkan Tugas',
-                        hintText: 'Contoh: Belajar Flutter',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: _addTodo,
-                    child: const Text(
-                      'Tambah',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: _todos.isEmpty
-                  ? const Center(
-                      child: Text(
-                        'Belum ada tugas.',
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: _todos.length,
-                      itemBuilder: (context, index) {
-                        return Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 2,
-                          margin: const EdgeInsets.symmetric(vertical: 6),
-                          child: ListTile(
-                            title: Text(
-                              _todos[index],
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _removeTodo(index),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
+    ),
+  );
+
+  // Dark theme
+  final ThemeData _darkTheme = ThemeData(
+    useMaterial3: true,
+    brightness: Brightness.dark,
+    colorScheme: ColorScheme.dark(
+      primary: Colors.blue.shade300,
+      secondary: Colors.tealAccent,
+      surface: Colors.grey.shade900,
+      background: Colors.black87,
+    ),
+    fontFamily: 'Poppins',
+    textTheme: const TextTheme(
+      displayLarge: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+      bodyLarge: TextStyle(fontSize: 16),
+      labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
-    );
-  }
+    ),
+  );
 }
